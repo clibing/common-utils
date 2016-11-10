@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>cn.linuxcrypt</groupId>
+    <artifactId>common-utils</artifactId>
+    <version>1.0.0</version>
+
+
+    <repositories>
+        <repository>
+            <id>LinuxcryptPublic</id>
+            <url>http://nexus.linuxcrypt.cn/nexus/content/groups/public/</url>
+        </repository>
+    </repositories>
+    <distributionManagement>
+        <repository>
+            <id>LinuxcryptRelease</id>
+            <url>http://nexus.linuxcrypt.cn/nexus/content/repositories/releases</url>
+        </repository>
+        <snapshotRepository>
+            <id>LinuxcrypSnapshots</id>
+            <url>http://nexus.linuxcrypt.cn/nexus/content/repositories/snapshots</url>
+        </snapshotRepository>
+    </distributionManagement>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <java.version>1.6</java.version>
+    </properties>
+
+    <developers>
+        <developer>
+            <id>wmsjhappy</id>
+            <name>刘柏勋</name>
+            <email>wmsjhappy@gmail.com</email>
+        </developer>
+    </developers>
+
+</project>
