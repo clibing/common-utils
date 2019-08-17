@@ -1,303 +1,143 @@
 package cn.linuxcrypt.common.util;
 
-import java.io.UnsupportedEncodingException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
-import java.security.spec.InvalidKeySpecException;
+import org.apache.commons.codec.binary.Base64;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
-import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
-import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.KeyGenerator;
-import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.DESKeySpec;
+import java.security.Key;
+import java.security.SecureRandom;
+import java.security.Security;
 
 /**
- * DES加密和解密。
- * 
- * @author 宋立君
- * @date 2014年07月03日
+ * DES安全编码组件
+ *
+ * @author wbw
+ * @version 1.0
  */
-public class DESUtil {
+public abstract class DESUtil {
+    static {
+        Security.insertProviderAt(new BouncyCastleProvider(), 1);
+    }
 
-	/** 安全密钥 */
-	private String keyData = "ABCDEFGHIJKLMNOPQRSTWXYZabcdefghijklmnopqrstwxyz0123456789-_.";
+    /**
+     * 密钥算法 <br>
+     * Java 6 只支持56bit密钥 <br>
+     * Bouncy Castle 支持64bit密钥
+     */
+    public static final String KEY_ALGORITHM = "DES";
 
-	/**
-	 * 功能：构造
-	 * 
-	 * @author 宋立君
-	 * @date 2014年07月03日
-	 */
-	public DESUtil() {
-	}
+    /**
+     * 加密/解密算法 / 工作模式 / 填充方式
+     */
+    public static final String CIPHER_ALGORITHM = "DES/ECB/PKCS5PADDING";
 
-	/**
-	 * 功能：构造
-	 * 
-	 * @author 宋立君
-	 * @date 2014年07月03日
-	 * @param key
-	 *            key
-	 */
-	public DESUtil(String key) {
-		this.keyData = key;
-	}
+    /**
+     * 转换密钥
+     *
+     * @param key 二进制密钥
+     * @return Key 密钥
+     * @throws Exception
+     */
+    private static Key toKey(byte[] key) throws Exception {
 
-	/**
-	 * 功能：加密 (UTF-8)
-	 * 
-	 * @author 宋立君
-	 * @date 2014年07月03日
-	 * @param source
-	 *            源字符串
-	 * @return String
-	 * @throws UnsupportedEncodingException
-	 *             编码异常
-	 */
-	public String encrypt(String source) throws UnsupportedEncodingException {
-		return encrypt(source, "UTF-8");
-	}
+        // 实例化DES密钥材料
+        DESKeySpec dks = new DESKeySpec(key);
 
-	/**
-	 * 
-	 * 功能：解密 (UTF-8)
-	 * 
-	 * @author 宋立君
-	 * @date 2014年07月03日
-	 * @param encryptedData
-	 *            被加密后的字符串
-	 * @return String
-	 * @throws UnsupportedEncodingException
-	 *             编码异常
-	 */
-	public String decrypt(String encryptedData)
-			throws UnsupportedEncodingException {
-		return decrypt(encryptedData, "UTF-8");
-	}
+        // 实例化秘密密钥工厂
+        SecretKeyFactory keyFactory = SecretKeyFactory
+                .getInstance(KEY_ALGORITHM);
 
-	/**
-	 * 功能：加密
-	 * 
-	 * @author 宋立君
-	 * @date 2014年07月03日
-	 * @param source
-	 *            源字符串
-	 * @param charSet
-	 *            编码
-	 * @return String
-	 * @throws UnsupportedEncodingException
-	 *             编码异常
-	 */
-	public String encrypt(String source, String charSet)
-			throws UnsupportedEncodingException {
-		String encrypt = null;
-		byte[] ret = encrypt(source.getBytes(charSet));
-		encrypt = new String(Base64.encode(ret));
-		return encrypt;
-	}
+        // 生成秘密密钥
+        SecretKey secretKey = keyFactory.generateSecret(dks);
 
-	/**
-	 * 
-	 * 功能：解密
-	 * 
-	 * @author 宋立君
-	 * @date 2014年07月03日
-	 * @param encryptedData
-	 *            被加密后的字符串
-	 * @param charSet
-	 *            编码
-	 * @return String
-	 * @throws UnsupportedEncodingException
-	 *             编码异常
-	 */
-	public String decrypt(String encryptedData, String charSet)
-			throws UnsupportedEncodingException {
-		String descryptedData = null;
-		byte[] ret = descrypt(Base64.decode(encryptedData.toCharArray()));
-		descryptedData = new String(ret, charSet);
-		return descryptedData;
-	}
+        return secretKey;
+    }
 
-	/**
-	 * 加密数据 用生成的密钥加密原始数据
-	 * 
-	 * @param primaryData
-	 *            原始数据
-	 * @return byte[]
-	 * @author 宋立君
-	 * @date 2014年07月03日
-	 */
-	private byte[] encrypt(byte[] primaryData) {
+    /**
+     * 解密
+     *
+     * @param data 待解密数据
+     * @param key  密钥
+     * @return byte[] 解密数据
+     * @throws Exception
+     */
+    public static byte[] decrypt(byte[] data, byte[] key) throws Exception {
 
-		/** 取得安全密钥 */
-		byte rawKeyData[] = getKey();
+        // 还原密钥
+        Key k = toKey(key);
 
-		/** DES算法要求有一个可信任的随机数源 */
-		SecureRandom sr = new SecureRandom();
+        // 实例化
+        Cipher cipher = Cipher.getInstance(CIPHER_ALGORITHM);
 
-		/** 使用原始密钥数据创建DESKeySpec对象 */
-		DESKeySpec dks = null;
-		try {
-			dks = new DESKeySpec(keyData.getBytes());
-		} catch (InvalidKeyException e) {
-			e.printStackTrace();
-		}
+        // 初始化，设置为解密模式
+        cipher.init(Cipher.DECRYPT_MODE, k);
 
-		/** 创建一个密钥工厂 */
-		SecretKeyFactory keyFactory = null;
-		try {
-			keyFactory = SecretKeyFactory.getInstance("DES");
-		} catch (NoSuchAlgorithmException e) {
-			e.printStackTrace();
-		}
+        // 执行操作
+        return cipher.doFinal(data);
+    }
 
-		/** 用密钥工厂把DESKeySpec转换成一个SecretKey对象 */
-		SecretKey key = null;
-		try {
-			key = keyFactory.generateSecret(dks);
-		} catch (InvalidKeySpecException e) {
-			e.printStackTrace();
-		}
+    /**
+     * 加密
+     *
+     * @param data 待加密数据
+     * @param key  密钥
+     * @return byte[] 加密数据
+     * @throws Exception
+     */
+    public static byte[] encrypt(byte[] data, byte[] key) throws Exception {
 
-		/** Cipher对象实际完成加密操作 */
-		Cipher cipher = null;
-		try {
-			cipher = Cipher.getInstance("DES");
-		} catch (NoSuchAlgorithmException e) {
-			e.printStackTrace();
-		} catch (NoSuchPaddingException e) {
-			e.printStackTrace();
-		}
+        // 还原密钥
+        Key k = toKey(key);
 
-		/** 用密钥初始化Cipher对象 */
-		try {
-			cipher.init(Cipher.ENCRYPT_MODE, key, sr);
-		} catch (InvalidKeyException e) {
-			e.printStackTrace();
-		}
+        // 实例化
+        Cipher cipher = Cipher.getInstance(CIPHER_ALGORITHM);
 
-		/** 正式执行加密操作 */
-		byte encryptedData[] = null;
-		try {
-			encryptedData = cipher.doFinal(primaryData);
-		} catch (IllegalStateException e) {
-			e.printStackTrace();
-		} catch (IllegalBlockSizeException e) {
-			e.printStackTrace();
-		} catch (BadPaddingException e) {
-			e.printStackTrace();
-		}
+        // 初始化，设置为加密模式
+        cipher.init(Cipher.ENCRYPT_MODE, k);
 
-		/** 返回加密数据 */
-		return encryptedData;
-	}
+        // 执行操作
+        return cipher.doFinal(data);
+    }
 
-	/**
-	 * 用密钥解密数据
-	 * 
-	 * @param encryptedData
-	 *            加密后的数据
-	 * @return byte[]
-	 * @author 宋立君
-	 * @date 2014年07月03日
-	 */
-	private byte[] descrypt(byte[] encryptedData) {
+    /**
+     * 生成密钥 <br>
+     * Java 6 只支持56bit密钥 <br>
+     * Bouncy Castle 支持64bit密钥 <br>
+     *
+     * @return byte[] 二进制密钥
+     * @throws Exception
+     */
+    public static byte[] initKey() throws Exception {
 
-		/** DES算法要求有一个可信任的随机数源 */
-		SecureRandom sr = new SecureRandom();
+        /*
+         * 实例化密钥生成器
+         *
+         * 若要使用64bit密钥注意替换 将下述代码中的KeyGenerator.getInstance(CIPHER_ALGORITHM);
+         * 替换为KeyGenerator.getInstance(CIPHER_ALGORITHM, "BC");
+         */
+        KeyGenerator kg = KeyGenerator.getInstance(KEY_ALGORITHM);
 
-		/** 取得安全密钥 */
-		byte rawKeyData[] = getKey();
+        /*
+         * 初始化密钥生成器 若要使用64bit密钥注意替换 将下述代码kg.init(56); 替换为kg.init(64);
+         */
+        kg.init(56, new SecureRandom());
 
-		/** 使用原始密钥数据创建DESKeySpec对象 */
-		DESKeySpec dks = null;
-		try {
-			dks = new DESKeySpec(keyData.getBytes());
-		} catch (InvalidKeyException e) {
-			e.printStackTrace();
-		}
+        // 生成秘密密钥
+        SecretKey secretKey = kg.generateKey();
 
-		/** 创建一个密钥工厂 */
-		SecretKeyFactory keyFactory = null;
-		try {
-			keyFactory = SecretKeyFactory.getInstance("DES");
-		} catch (NoSuchAlgorithmException e) {
-			e.printStackTrace();
-		}
+        // 获得密钥的二进制编码形式
+        return secretKey.getEncoded();
+    }
 
-		/** 用密钥工厂把DESKeySpec转换成一个SecretKey对象 */
-		SecretKey key = null;
-		try {
-			key = keyFactory.generateSecret(dks);
-		} catch (InvalidKeySpecException e) {
-			e.printStackTrace();
-		}
-
-		/** Cipher对象实际完成加密操作 */
-		Cipher cipher = null;
-		try {
-			cipher = Cipher.getInstance("DES");
-		} catch (NoSuchAlgorithmException e) {
-			e.printStackTrace();
-		} catch (NoSuchPaddingException e) {
-			e.printStackTrace();
-		}
-
-		/** 用密钥初始化Cipher对象 */
-		try {
-			cipher.init(Cipher.DECRYPT_MODE, key, sr);
-		} catch (InvalidKeyException e) {
-			e.printStackTrace();
-		}
-
-		/** 正式执行解密操作 */
-		byte decryptedData[] = null;
-		try {
-			decryptedData = cipher.doFinal(encryptedData);
-		} catch (IllegalStateException e) {
-			e.printStackTrace();
-		} catch (IllegalBlockSizeException e) {
-			e.printStackTrace();
-		} catch (BadPaddingException e) {
-			e.printStackTrace();
-		}
-
-		return decryptedData;
-	}
-
-	/**
-	 * 取得安全密钥 此方法作废,因为每次key生成都不一样导致解密加密用的密钥都不一样， 从而导致Given final block not
-	 * properly padded错误.
-	 * 
-	 * @return byte数组
-	 * @author 宋立君
-	 * @date 2014年07月03日
-	 */
-	private byte[] getKey() {
-
-		/** DES算法要求有一个可信任的随机数源 */
-		SecureRandom sr = new SecureRandom();
-
-		/** 为我们选择的DES算法生成一个密钥生成器对象 */
-		KeyGenerator kg = null;
-		try {
-			kg = KeyGenerator.getInstance("DES");
-		} catch (NoSuchAlgorithmException e) {
-			e.printStackTrace();
-		}
-		kg.init(sr);
-
-		/** 生成密钥工具类 */
-		SecretKey key = kg.generateKey();
-
-		/** 生成密钥byte数组 */
-		byte rawKeyData[] = key.getEncoded();
-
-		return rawKeyData;
-	}
-
+    public static byte[] initKey(String seed) throws Exception {
+        KeyGenerator kg = KeyGenerator.getInstance(KEY_ALGORITHM);
+        SecureRandom secureRandom = new SecureRandom(new Base64().decode(seed));
+        kg.init(secureRandom);
+        SecretKey secretKey = kg.generateKey();
+        return secretKey.getEncoded();
+    }
 }

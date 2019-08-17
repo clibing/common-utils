@@ -350,7 +350,8 @@ class QueryThread extends Thread {
 		this.dbUtil = dbUtil;
 	}
 
-	public void run() {
+	@Override
+    public void run() {
 		while (true) {
 			try {
 				if (startQuery) {
