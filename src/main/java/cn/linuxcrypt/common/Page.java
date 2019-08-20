@@ -12,10 +12,10 @@ import java.util.List;
  * 实现分页辅助类
  * @author clibing
  */
-public class Page {
+public class Page<T> {
     /** 查询数据列表 */
     @Getter @Setter
-    private List records = Collections.emptyList();
+    private List<T> records = Collections.emptyList();
 
     /** 总数 */
     @Getter @Setter
