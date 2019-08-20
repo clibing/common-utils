@@ -1,6 +1,9 @@
 package cn.linuxcrypt.common.util;
 
+import cn.linuxcrypt.common.Constant;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.*;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.ResponseHandler;
@@ -37,6 +40,7 @@ import org.apache.http.util.EntityUtils;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
+import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.charset.CodingErrorAction;
@@ -44,6 +48,7 @@ import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * 基于Apache HttpClient的工具类
@@ -81,8 +86,10 @@ public class HttpClient {
     private static final RequestConfig DEFAULT_REQUEST_CONFIG;
     private static final Registry<CookieSpecProvider> DEFAULT_COOKIE_SPEC_REGISTRY;
     private static final CloseableHttpClient HTTP_CLIENT;
+    private static boolean isWindow = Boolean.FALSE;
 
     static {
+        isWindow = System.getProperties().getProperty("os.name").toUpperCase().indexOf("WINDOWS") != -1;
         try {
             SSLContext sslContext = SSLContexts.custom().build();
             sslContext.init(null, new TrustManager[]{new X509TrustManager() {
@@ -419,5 +426,118 @@ public class HttpClient {
                 return message;
             }
         }
+    }
+
+    public static File download(String url, Map<String, String> headers) {
+        if (isWindow) {
+            return download(url, "C:\\Windows\\Temp", UUID.randomUUID().toString(), headers);
+        } else {
+            return download(url, "/tmp", UUID.randomUUID().toString(), headers);
+        }
+    }
+
+    public static File download(String url, String basePath, Map<String, String> headers) {
+        return download(url, basePath, UUID.randomUUID().toString(), headers);
+    }
+
+    public static File download(String url, String basePath, String fileName, Map<String, String> headers) {
+        // we're using GET but it could be via POST as well
+        HttpGet get = new HttpGet(url);
+        if (headers != null) {
+            headers.forEach((k, v) -> get.setHeader(k, v));
+        }
+
+        File downloaded = null;
+        try {
+            downloaded = getHttpClient().execute(get, new FileDownloadResponseHandler(basePath, fileName));
+        } catch (IOException e) {
+            log.error("download image exception, the url: {}", url, e);
+        }
+
+        return downloaded;
+    }
+
+    static class FileDownloadResponseHandler implements ResponseHandler<File> {
+        private final String basePath;
+        private final String fileName;
+
+        public FileDownloadResponseHandler(String basePath, String fileName) {
+            if (basePath.endsWith(File.separator)) {
+                this.basePath = basePath;
+            } else {
+                this.basePath = basePath + File.separator;
+            }
+
+
+            if (fileName.startsWith(File.separator)) {
+                fileName = fileName.substring(1);
+            }
+
+            if (fileName.endsWith(File.separator)) {
+                fileName = fileName.substring(0, fileName.length() - 1);
+            }
+
+            if (fileName.endsWith(Constant.Punctuation.SPOT)) {
+                fileName = fileName.substring(0, fileName.length() - 1);
+            }
+
+            this.fileName = fileName + ".";
+        }
+
+        @Override
+        public File handleResponse(HttpResponse response) throws IOException {
+            String suffix = "jpg";
+            Header[] headers = response.getHeaders("Content-Type");
+            if (headers != null || headers.length > 0) {
+                for (Header header : headers) {
+                    String value = header.getValue();
+                    if (StringUtils.isBlank(value)) {
+                        continue;
+                    }
+                    value = ImageContentType.get(value);
+                    suffix = value;
+                }
+            }
+
+            File target = new File(this.basePath + this.fileName + suffix);
+            if (!target.getParentFile().exists()) {
+                target.getParentFile().mkdirs();
+            }
+
+            byte[] data = EntityUtils.toByteArray(response.getEntity());
+            FileUtils.writeByteArrayToFile(target, data);
+            return target;
+        }
+    }
+
+    public enum ImageContentType {
+        gif("image/gif"),
+//        net("image/pnetvue"),
+//        tif("image/tiff"),
+//        fax("image/fax"),
+        ico("image/x-icon"),
+//        jfif("image/jpeg"),
+//        jpe("image/jpeg"),
+//        jpeg("image/jpeg"),
+        jpg("image/jpeg"),
+        png("image/png");
+        private String value;
+
+        ImageContentType(String value) {
+            this.value = value;
+        }
+
+        public static String get(String type) {
+            if (StringUtils.isBlank(type)) {
+                return ImageContentType.jpg.name();
+            }
+            for (ImageContentType contentType : ImageContentType.values()) {
+                if (type.toLowerCase().indexOf(contentType.value) != -1) {
+                    return contentType.name();
+                }
+            }
+            return ImageContentType.jpg.name();
+        }
+
     }
 }
