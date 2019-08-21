@@ -42,23 +42,34 @@ public final class CollectionUtils {
 
     public static <T> boolean isEmpty(Collection<T> collection) {
         if (collection == null) {
-            return Boolean.FALSE;
+            return Boolean.TRUE;
         }
-        return collection.stream().filter(v -> v != null).count() > Constant.Number.L.ZERO;
+        return collection.stream().filter(v -> v != null).count() <= Constant.Number.L.ZERO;
+    }
+
+    public static <T> boolean isNotEmpty(Collection<T> collection) {
+        return !isEmpty(collection);
     }
 
     public static <K, V> boolean isEmpty(Map<K, V> map) {
         if (map == null) {
-            return Boolean.FALSE;
+            return Boolean.TRUE;
         }
         return map.isEmpty();
     }
 
+    public static <K, V> boolean isNotEmpty(Map<K, V> map) {
+        return !isEmpty(map);
+    }
 
     public static <E> boolean isEmpty(Set<E> set) {
         if (set == null) {
-            return Boolean.FALSE;
+            return Boolean.TRUE;
         }
-        return set.stream().filter(e -> e != null).count() > Constant.Number.L.ZERO;
+        return set.stream().filter(e -> e != null).count() <= Constant.Number.L.ZERO;
+    }
+
+    public static <E> boolean isNotEmpty(Set<E> set) {
+        return !isEmpty(set);
     }
 }
