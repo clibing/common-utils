@@ -6,7 +6,7 @@
 
     <groupId>cn.linuxcrypt</groupId>
     <artifactId>common-utils</artifactId>
-    <version>1.0.8</version>
+    <version>1.0.9</version>
 
 
     <properties>
@@ -24,6 +24,8 @@
         <commons-dbcp.version>1.4</commons-dbcp.version>
         <commons-dbcp2.version>2.7.0</commons-dbcp2.version>
         <commons-dbutils.version>1.7</commons-dbutils.version>
+        <commons-fileupload.version>1.4</commons-fileupload.version>
+        <commons-pool2.version>2.7.0</commons-pool2.version>
 
         <poi.version>3.15</poi.version>
         <dom4j.version>2.0.0</dom4j.version>
@@ -95,8 +97,11 @@
             <artifactId>commons-io</artifactId>
             <version>${commons-io.version}</version>
         </dependency>
-
-
+        <dependency>
+            <groupId>commons-fileupload</groupId>
+            <artifactId>commons-fileupload</artifactId>
+            <version>${commons-fileupload.version}</version>
+        </dependency>
         <dependency>
             <groupId>commons-codec</groupId>
             <artifactId>commons-codec</artifactId>
@@ -117,7 +122,11 @@
             <artifactId>commons-dbutils</artifactId>
             <version>${commons-dbutils.version}</version>
         </dependency>
-
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-pool2</artifactId>
+            <version>${commons-pool2.version}</version>
+        </dependency>
 
         <dependency>
             <groupId>org.apache.poi</groupId>
