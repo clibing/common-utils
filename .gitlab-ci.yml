@@ -7,5 +7,5 @@ build:
   script:
     - bash cmvn -T 4 clean install deploy -Dmaven.test.skip=true
   tags:
-    - proxmox
+    - git.linuxcrypt.cn
   when: manual
