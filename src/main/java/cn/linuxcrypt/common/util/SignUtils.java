@@ -82,12 +82,11 @@ public class SignUtils {
 
         //签名结果与签名方式加入请求提交参数组中
         data.put("sign", value);
-        data.put("sign_type", signType.name());
     }
 
     public String mapConvertStringAndSign(Map<String, String> data) {
         data.remove("sign");
-        data.remove("sign_type");
+        data.remove("signType");
         return mapConvertStringWithAnd(data, "&", false);
     }
 
