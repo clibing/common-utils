@@ -6,8 +6,7 @@
 
     <groupId>cn.linuxcrypt</groupId>
     <artifactId>common-utils</artifactId>
-    <version>1.0.11</version>
-
+    <version>1.0.12</version>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

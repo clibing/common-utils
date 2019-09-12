@@ -23,12 +23,22 @@ public abstract class Base64Util {
      * @return String 编码数据
      * @throws Exception
      */
-    public static String encode(String data) throws Exception {
-
+    public static byte[] encodeByte(String data) throws Exception {
         // 执行编码
         byte[] b = Base64.encodeBase64(data.getBytes(ENCODING));
 
-        return new String(b, ENCODING);
+        return b;
+    }
+
+    /**
+     * Base64编码
+     *
+     * @param data 待编码数据
+     * @return String 编码数据
+     * @throws Exception
+     */
+    public static String encode(String data) throws Exception {
+        return new String(encodeByte(data), ENCODING);
     }
 
     /**
@@ -54,12 +64,21 @@ public abstract class Base64Util {
      * @return String 解码数据
      * @throws Exception
      */
-    public static String decode(String data) throws Exception {
-
+    public static byte[] decodeByte(String data) throws Exception {
         // 执行解码
         byte[] b = Base64.decodeBase64(data.getBytes(ENCODING));
+        return b;
+    }
 
-        return new String(b, ENCODING);
+    /**
+     * Base64解码
+     *
+     * @param data 待解码数据
+     * @return String 解码数据
+     * @throws Exception
+     */
+    public static String decode(String data) throws Exception {
+        return new String(decodeByte(data), ENCODING);
     }
 
 }
