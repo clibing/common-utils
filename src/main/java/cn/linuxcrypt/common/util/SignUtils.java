@@ -18,10 +18,7 @@ import java.security.PublicKey;
 import java.security.SignatureException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -60,7 +57,7 @@ public class SignUtils {
      * @return
      */
 
-    public void sign(Map<String, String> data, String charset, String secretKey, SignTypeEnum signType) {
+    public static void sign(Map<String, String> data, String charset, String secretKey, SignTypeEnum signType) {
         Assert.notNull(data, "参数不能为空");
         Assert.notNull(secretKey, "密钥不能为空");
         Assert.notNull(signType, "签名类型不能为空");
@@ -84,13 +81,13 @@ public class SignUtils {
         data.put("sign", value);
     }
 
-    public String mapConvertStringAndSign(Map<String, String> data) {
+    public static String mapConvertStringAndSign(Map<String, String> data) {
         data.remove("sign");
         data.remove("signType");
         return mapConvertStringWithAnd(data, "&", false);
     }
 
-    public String mapConvertStringAndEncode(Map<String, String> data) {
+    public static String mapConvertStringAndEncode(Map<String, String> data) {
         return mapConvertStringWithAnd(data, "&", true);
     }
 
@@ -101,17 +98,14 @@ public class SignUtils {
      * @param separator
      * @return
      */
-    public String mapConvertStringWithAnd(Map<String, String> data, String separator, boolean valueEncode) {
+    private static String mapConvertStringWithAnd(Map<String, String> data, String separator, boolean valueEncode) {
         Assert.notNull(separator, "拼接的字符串不能为空");
 
-        List<String> keys = new ArrayList<>(data.keySet());
-        // 按key的 ASCII 表
-        Collections.sort(keys);
-        List<String> keyAndValue = keys.stream()
-                // 将空字符串过滤
-                .filter(k -> StringUtils.isNotBlank(data.get(k)))
+        List<String> keyAndValue = data.entrySet().stream()
+                .filter(e -> StringUtils.isNotBlank(e.getValue()))
+                .sorted(Map.Entry.comparingByKey())
                 // 将值进行编码，注意在计算签名的时候不需要进行encode 注意 encode时只有get请求使用
-                .map(k -> String.format("%s=%s", k, valueEncode ? encode(data.get(k)) : data.get(k)))
+                .map(e -> String.format("%s=%s", e.getKey(), valueEncode ? encode(e.getValue()) : e.getValue()))
                 .collect(Collectors.toList());
         String content = StringUtils.join(keyAndValue, separator);
         return content;
@@ -124,7 +118,7 @@ public class SignUtils {
      * @param param
      * @return
      */
-    public String encode(String param) {
+    private static String encode(String param) {
         if (StringUtils.isBlank(param)) {
             return param;
         }
