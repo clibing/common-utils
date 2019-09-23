@@ -51,11 +51,11 @@ public class Page<T> {
             this.pageNumber = Constant.Page.DEFAULT_PAGE_NUMBER;
         }
 
+        this.pageSize = pageSize;
+
         if (pageSize == null) {
             this.pageSize = Constant.Page.DEFAULT_PAGE_SIZE;
         }
-
-        this.pageSize = pageSize;
 
         this.offset = (pageNumber - 1) * pageSize * 1L;
         this.limit = pageSize * 1L;
