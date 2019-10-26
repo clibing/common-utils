@@ -47,16 +47,14 @@ public class Page<T> {
     private Double afterScore;
 
     public Page(Integer pageNumber, Integer pageSize) {
-        if (pageNumber == null) {
+        if (pageNumber == null || pageNumber < Constant.Page.DEFAULT_PAGE_NUMBER) {
             this.pageNumber = Constant.Page.DEFAULT_PAGE_NUMBER;
         }
+
+        this.pageSize = pageSize;
 
         if (pageSize == null) {
             this.pageSize = Constant.Page.DEFAULT_PAGE_SIZE;
-        }
-
-        if (pageNumber < Constant.Page.DEFAULT_PAGE_NUMBER) {
-            this.pageNumber = Constant.Page.DEFAULT_PAGE_NUMBER;
         }
 
         this.offset = (pageNumber - 1) * pageSize * 1L;
