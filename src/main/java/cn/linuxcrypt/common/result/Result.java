@@ -20,6 +20,8 @@ public class Result<T extends Object> {
 
     private String message;
 
+    private Long total;
+
     public Result() {
     }
 
@@ -77,6 +79,11 @@ public class Result<T extends Object> {
         }
 
         return new Result(Codes.SUCCESS);
+    }
+
+    public Result total(Long total){
+        this.setTotal(total);
+        return this;
     }
 
     public static Result fail(String message) {
