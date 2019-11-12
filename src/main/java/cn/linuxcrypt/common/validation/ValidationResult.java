@@ -1,15 +1,15 @@
 package cn.linuxcrypt.common.validation;
 
+import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 
 import java.text.MessageFormat;
 import java.util.Map;
 
 /**
- * @author ztkj-hzb
- * @Date 2019/8/28 11:26
  * @Description 实体校验结果
  */
+@Data
 public class ValidationResult {
 
     /**
@@ -36,22 +36,5 @@ public class ValidationResult {
             message.append(MessageFormat.format("{0}:{1} \r\n", key, value));
         });
         return message.toString();
-    }
-
-
-    public boolean isHasErrors() {
-        return hasErrors;
-    }
-
-    public void setHasErrors(boolean hasErrors) {
-        this.hasErrors = hasErrors;
-    }
-
-    public Map<String, String> getErrorMsg() {
-        return errorMsg;
-    }
-
-    public void setErrorMsg(Map<String, String> errorMsg) {
-        this.errorMsg = errorMsg;
     }
 }

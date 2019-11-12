@@ -34,9 +34,34 @@ public class ValidateUtil {
      * @return
      */
     public static <T> ValidationResult validateEntity(T obj) {
+        return validateEntity(obj, Default.class);
+    }
+
+
+    /**
+     * 校验实体，返回实体所有属性的校验结果
+     *
+     * @param obj
+     * @param <T>
+     * @return
+     */
+    public static <T> ValidationResult validateEntity(T obj, Class ... classes) {
         //解析校验结果
-        Set<ConstraintViolation<T>> validateSet = validator.validate(obj, Default.class);
+        Set<ConstraintViolation<T>> validateSet = validator.validate(obj, classes);
         return buildValidationResult(validateSet);
+    }
+
+
+    /**
+     * 校验指定实体的指定属性是否存在异常
+     *
+     * @param obj
+     * @param propertyName
+     * @param <T>
+     * @return
+     */
+    public static <T> ValidationResult validateProperty(T obj, String propertyName) {
+        return validateProperty(obj, propertyName, Default.class);
     }
 
     /**
