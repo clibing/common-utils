@@ -6,7 +6,7 @@
 
     <groupId>cn.linuxcrypt</groupId>
     <artifactId>common-utils</artifactId>
-    <version>1.0.16</version>
+    <version>1.0.17</version>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -52,6 +52,7 @@
         <spring.version>5.1.9.RELEASE</spring.version>
         <jackson.version>2.9.9</jackson.version>
         <fastjson.version>1.2.59</fastjson.version>
+        <hibernate-validator.version>6.1.0.Final</hibernate-validator.version>
     </properties>
 
     <dependencies>
@@ -264,6 +265,12 @@
             <artifactId>javax.servlet-api</artifactId>
             <version>${servlet-api.version}</version>
             <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-validator</artifactId>
+            <version>${hibernate-validator.version}</version>
         </dependency>
 
     </dependencies>
