@@ -78,6 +78,7 @@ public class SignUtils {
         }
 
         //签名结果与签名方式加入请求提交参数组中
+        data.put("signType", signType.name());
         data.put("sign", value);
     }
 
