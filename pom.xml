@@ -279,24 +279,24 @@
         <repository>
             <id>LinuxcryptPublic</id>
             <layout>default</layout>
-            <url>http://nexus.linuxcrypt.cn/repository/public/</url>
+            <url>https://nexus.linuxcrypt.cn/repository/public/</url>
         </repository>
     </repositories>
     <distributionManagement>
         <repository>
             <id>LinuxcryptRelease</id>
-            <url>http://nexus.linuxcrypt.cn/repository/releases/</url>
+            <url>https://nexus.linuxcrypt.cn/repository/releases/</url>
         </repository>
         <snapshotRepository>
             <id>LinuxcrypSnapshots</id>
-            <url>http://nexus.linuxcrypt.cn/repository/snapshots/</url>
+            <url>https://nexus.linuxcrypt.cn/repository/snapshots/</url>
         </snapshotRepository>
     </distributionManagement>
 
     <developers>
         <developer>
             <id>wmsjhappy</id>
-            <name>刘柏勋</name>
+            <name>clibing</name>
             <email>wmsjhappy@gmail.com</email>
         </developer>
     </developers>
