@@ -18,12 +18,7 @@ import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.DateUtil;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.ss.usermodel.WorkbookFactory;
+import org.apache.poi.ss.usermodel.*;
 
 /**
  * 封装对excel的操作，包括本地读写excel和流中输出excel,支持office 2007。<br/>
@@ -89,12 +84,12 @@ public class ExcelUtil {
 			for (Cell cell : row) {
 				// cell.getCellType是获得cell里面保存的值的type
 				switch (cell.getCellType()) {
-				case Cell.CELL_TYPE_BOOLEAN:
+					case BOOLEAN:
 					// 得到Boolean对象的方法
 					rowObject = CollectionUtil.addObjectToArray(rowObject,
 							cell.getBooleanCellValue());
 					break;
-				case Cell.CELL_TYPE_NUMERIC:
+					case NUMERIC:
 					// 先看是否是日期格式
 					if (DateUtil.isCellDateFormatted(cell)) {
 						// 读取日期格式
@@ -110,12 +105,12 @@ public class ExcelUtil {
 								value);
 					}
 					break;
-				case Cell.CELL_TYPE_FORMULA:
+				case FORMULA:
 					// 读取公式
 					rowObject = CollectionUtil.addObjectToArray(rowObject,
 							cell.getCellFormula());
 					break;
-				case Cell.CELL_TYPE_STRING:
+				case STRING:
 					// 读取String
 					rowObject = CollectionUtil.addObjectToArray(rowObject, cell
 							.getRichStringCellValue().toString());
@@ -234,8 +229,9 @@ public class ExcelUtil {
 		// 如果路径不存在，创建路径
 		File file = new File(filePath);
 		// System.out.println(path+"-----------"+file.exists());
-		if (!file.exists())
+		if (!file.exists()) {
 			file.mkdirs();
+		}
 		FileOutputStream fileOut = new FileOutputStream(path);
 		workbook.write(fileOut);
 		fileOut.close();
@@ -307,7 +303,7 @@ public class ExcelUtil {
 			// 创建第一行各个字段名称的单元格
 			cell = row.createCell((short) i);
 			// 设置单元格内容为字符串型
-			cell.setCellType(HSSFCell.CELL_TYPE_STRING);
+			cell.setCellType(CellType.STRING);
 			// 为了能在单元格中输入中文,设置字符集为UTF_16
 			// cell.setEncoding(HSSFCell.ENCODING_UTF_16);
 			// 给单元格内容赋值
@@ -325,7 +321,7 @@ public class ExcelUtil {
 			for (int j = 0; j < tmp.length; j++) {
 				cell = row.createCell((short) j);
 				// 设置单元格字符类型为String
-				cell.setCellType(HSSFCell.CELL_TYPE_STRING);
+				cell.setCellType(CellType.STRING);
 				tempCellContent = (tmp[j] == null) ? "" : tmp[j].toString();
 				cell.setCellValue(new HSSFRichTextString(tempCellContent));
 
