@@ -6,53 +6,53 @@
 
     <groupId>cn.linuxcrypt</groupId>
     <artifactId>common-utils</artifactId>
-    <version>1.0.20</version>
+    <version>1.0.21</version>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <java.version>1.8</java.version>
 
         <caffeine.version>2.8.0</caffeine.version>
-        <guava.version>28.0-jre</guava.version>
+        <guava.version>30.1-jre</guava.version>
         <pinyin4j.version>2.5.1</pinyin4j.version>
 
         <commons-compress.version>1.20</commons-compress.version>
         <commons-net.version>3.5</commons-net.version>
-        <commons-lang3.version>3.7</commons-lang3.version>
-        <commons-io.version>2.6</commons-io.version>
-        <commons-codec.version>1.13</commons-codec.version>
+        <commons-lang3.version>3.12.0</commons-lang3.version>
+        <commons-io.version>2.8.0</commons-io.version>
+        <commons-codec.version>1.15</commons-codec.version>
         <commons-dbcp.version>1.4</commons-dbcp.version>
         <commons-dbcp2.version>2.7.0</commons-dbcp2.version>
         <commons-dbutils.version>1.7</commons-dbutils.version>
         <commons-fileupload.version>1.4</commons-fileupload.version>
-        <commons-pool2.version>2.7.0</commons-pool2.version>
+        <commons-pool2.version>2.9.0</commons-pool2.version>
 
         <poi.version>4.1.2</poi.version>
         <dom4j.version>2.1.3</dom4j.version>
 
         <fst.version>2.57</fst.version>
-        <reflections.version>0.9.11</reflections.version>
+        <reflections.version>0.9.12</reflections.version>
         <bcprov-jdk15on.version>1.62</bcprov-jdk15on.version>
 
-        <zxing.version>3.4.0</zxing.version>
+        <zxing.version>3.4.1</zxing.version>
 
-        <jodd-bean.version>5.0.13</jodd-bean.version>
-        <joda-time.version>2.10.3</joda-time.version>
+        <jodd-bean.version>5.1.1</jodd-bean.version>
+        <joda-time.version>2.10.10</joda-time.version>
 
         <httpclient.version>4.5.9</httpclient.version>
-        <lombok.version>1.18.8</lombok.version>
-        <okhttp.version>4.1.0</okhttp.version>
+        <lombok.version>1.18.18</lombok.version>
+        <okhttp.version>4.9.1</okhttp.version>
 
         <janino.version>2.7.8</janino.version>
-        <slf4j.version>1.7.26</slf4j.version>
+        <slf4j.version>1.7.30</slf4j.version>
         <logback.version>1.2.3</logback.version>
 
         <servlet-api.version>3.1.0</servlet-api.version>
 
-        <spring.version>5.1.9.RELEASE</spring.version>
-        <jackson.version>2.11.0</jackson.version>
-        <fastjson.version>1.2.59</fastjson.version>
-        <hibernate-validator.version>6.1.0.Final</hibernate-validator.version>
+        <spring.version>5.1.20.RELEASE</spring.version>
+        <jackson.version>2.12.2</jackson.version>
+        <fastjson.version>1.2.75</fastjson.version>
+        <hibernate-validator.version>7.0.1.Final</hibernate-validator.version>
     </properties>
 
     <dependencies>
