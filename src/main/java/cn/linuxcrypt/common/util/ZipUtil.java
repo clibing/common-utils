@@ -23,22 +23,6 @@ import org.apache.commons.compress.utils.IOUtils;
  * @date 2014年06月25日
  */
 public class ZipUtil {
-
-	// public static void main(String[] args){
-	// try {
-	// //new ZipUtil().decompressZip(new
-	// File("d://img.zip"),"img/pic20140626.jpg","d://");
-	// new ZipUtil().decompressZip(new File("d://img.zip"),"flight.log","d://");
-	// //new File("d://flight.log").delete();
-	// //ZipUtil.compress(new File("D://测试压缩文件"),new File("d://img.zip"));
-	// // ZipUtil.compress(new File[]{new
-	// File("F:/testZIP/testzip.txt"),new File("d://ftp"),new
-	// File("e://ftp")},new File("d://压缩文件.zip"));
-	// } catch (IOException e) {
-	// e.printStackTrace();
-	// }
-	// }
-
 	/**
 	 * 把N多文件或文件夹压缩成zip。
 	 * 
