@@ -19,7 +19,7 @@
         <commons-compress.version>1.20</commons-compress.version>
         <commons-net.version>3.5</commons-net.version>
         <commons-lang3.version>3.7</commons-lang3.version>
-        <commons-io.version>2.6</commons-io.version>
+        <commons-io.version>2.7</commons-io.version>
         <commons-codec.version>1.13</commons-codec.version>
         <commons-dbcp.version>1.4</commons-dbcp.version>
         <commons-dbcp2.version>2.7.0</commons-dbcp2.version>
