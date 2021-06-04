@@ -39,7 +39,7 @@
         <jodd-bean.version>5.0.13</jodd-bean.version>
         <joda-time.version>2.10.3</joda-time.version>
 
-        <httpclient.version>4.5.9</httpclient.version>
+        <httpclient.version>4.5.13</httpclient.version>
         <lombok.version>1.18.8</lombok.version>
         <okhttp.version>4.1.0</okhttp.version>
 
