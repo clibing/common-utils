@@ -16,7 +16,7 @@
         <guava.version>28.0-jre</guava.version>
         <pinyin4j.version>2.5.1</pinyin4j.version>
 
-        <commons-compress.version>1.20</commons-compress.version>
+        <commons-compress.version>1.21</commons-compress.version>
         <commons-net.version>3.5</commons-net.version>
         <commons-lang3.version>3.7</commons-lang3.version>
         <commons-io.version>2.6</commons-io.version>
