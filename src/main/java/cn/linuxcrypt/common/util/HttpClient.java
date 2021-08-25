@@ -1,7 +1,13 @@
 package cn.linuxcrypt.common.util;
 
 import cn.linuxcrypt.common.Constant;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.*;
@@ -23,7 +29,6 @@ import org.apache.http.conn.socket.ConnectionSocketFactory;
 import org.apache.http.conn.socket.PlainConnectionSocketFactory;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.cookie.CookieSpecProvider;
-import org.apache.http.entity.ContentType;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.DefaultHttpRequestRetryHandler;
 import org.apache.http.impl.client.HttpClients;
@@ -40,15 +45,13 @@ import org.apache.http.util.EntityUtils;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.charset.CodingErrorAction;
 import java.security.cert.X509Certificate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * 基于Apache HttpClient的工具类
@@ -57,26 +60,26 @@ import java.util.UUID;
  */
 @Slf4j
 public class HttpClient {
-    /*
+    /**
      * 默认编码
      */
     private static final String DEFAULT_CHARSET = "UTF-8";
-    /*
+    /**
      * 默认连接池中最大连接数
      */
     private static final int DEFAULT_CONNECTION_MAX_TOTAL = 200;
-    /*
+    /**
      * 从连接池中获取请求连接的超时时间
      * 0 无限制
      * -1 走系统默认设置
      */
     private static final int DEFAULT_CONNECTION_REQUEST_TIMEOUT = -1;
 
-    /*
+    /**
      * 默认连接超时时间
      */
     private static final int DEFAULT_CONNECT_TIMEOUT = 15000;
-    /*
+    /**
      * 默认socket读取数据超时时间,具体的长耗时请求中(如文件传送等)必须覆盖此设置
      */
     private static final int DEFAULT_SO_TIMEOUT = 15000;
@@ -361,7 +364,8 @@ public class HttpClient {
         public String handleResponse(HttpResponse response) throws ClientProtocolException, IOException {
             HttpEntity httpEntity = response.getEntity();
             if (httpEntity != null) {
-                return EntityUtils.toString(httpEntity, defaultCharset == null ? ContentType.getOrDefault(httpEntity).getCharset() : defaultCharset);
+                return EntityUtils.toString(httpEntity, defaultCharset == null ? org.apache.http.entity.ContentType
+                        .getOrDefault(httpEntity).getCharset() : defaultCharset);
             }
             return null;
         }
@@ -441,102 +445,164 @@ public class HttpClient {
     }
 
     public static File download(String url, String basePath, String fileName, Map<String, String> headers) {
+        Meta meta = baseDownload(url, basePath, fileName, headers);
+
+        if (basePath.endsWith(File.separator)) {
+            basePath = basePath;
+        } else {
+            basePath = basePath + File.separator;
+        }
+
+        if (fileName.startsWith(File.separator)) {
+            fileName = fileName.substring(1);
+        }
+
+        if (fileName.endsWith(File.separator)) {
+            fileName = fileName.substring(0, fileName.length() - 1);
+        }
+
+        if (fileName.endsWith(Constant.Punctuation.SPOT)) {
+            fileName = fileName.substring(0, fileName.length() - 1);
+        }
+
+        fileName = fileName + ".";
+
+        String suffix = "";
+        if(meta.getContentType() != null) {
+           suffix = meta.getContentType().name();
+        }
+        File target = new File(basePath + fileName + suffix);
+        if (!target.getParentFile().exists()) {
+            target.getParentFile().mkdirs();
+        }
+
+        try {
+            FileUtils.writeByteArrayToFile(target, meta.getData());
+        } catch (IOException e) {
+            log.error("save byte[] to file exception, the url: {}", url, e);
+        }
+
+        return target;
+    }
+
+    public static Meta getDownloadMeta(String url, Map<String, String> headers) {
+       return baseDownload(url, "", "", headers);
+    }
+
+    public static Meta baseDownload(String url, String basePath, String fileName, Map<String, String> headers) {
         // we're using GET but it could be via POST as well
         HttpGet get = new HttpGet(url);
         if (headers != null) {
             headers.forEach((k, v) -> get.setHeader(k, v));
         }
 
-        File downloaded = null;
+        Meta meta = null;
         try {
-            downloaded = getHttpClient().execute(get, new FileDownloadResponseHandler(basePath, fileName));
+            meta = getHttpClient().execute(get, new FileDownloadResponseHandler());
+            meta.getRequestHeader().putAll(headers);
+            meta.setSource(url);
+            meta.setBasePath(basePath);
+            meta.setFileName(fileName);
         } catch (IOException e) {
-            log.error("download image exception, the url: {}", url, e);
+            log.error("download exception, the url: {}", url, e);
         }
-
-        return downloaded;
+        return meta;
     }
 
-    static class FileDownloadResponseHandler implements ResponseHandler<File> {
-        private final String basePath;
-        private final String fileName;
+    @Getter
+    @Setter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class Meta {
+        private String source;
+        private ContentType contentType;
+        private byte[] data;
+        private Map<String, String> requestHeader = new HashMap<>();
+        private Map<String, String> responseHeader = new HashMap<>();
+        private String basePath;
+        private String fileName;
+        private File file;
+    }
 
-        public FileDownloadResponseHandler(String basePath, String fileName) {
-            if (basePath.endsWith(File.separator)) {
-                this.basePath = basePath;
-            } else {
-                this.basePath = basePath + File.separator;
-            }
-
-
-            if (fileName.startsWith(File.separator)) {
-                fileName = fileName.substring(1);
-            }
-
-            if (fileName.endsWith(File.separator)) {
-                fileName = fileName.substring(0, fileName.length() - 1);
-            }
-
-            if (fileName.endsWith(Constant.Punctuation.SPOT)) {
-                fileName = fileName.substring(0, fileName.length() - 1);
-            }
-
-            this.fileName = fileName + ".";
-        }
-
+    static class FileDownloadResponseHandler implements ResponseHandler<Meta> {
         @Override
-        public File handleResponse(HttpResponse response) throws IOException {
-            String suffix = "jpg";
-            Header[] headers = response.getHeaders("Content-Type");
-            if (headers != null || headers.length > 0) {
-                for (Header header : headers) {
-                    String value = header.getValue();
-                    if (StringUtils.isBlank(value)) {
-                        continue;
+        public Meta handleResponse(HttpResponse response) throws IOException {
+            Meta meta = new Meta();
+            for (Header header : response.getAllHeaders()) {
+                meta.getResponseHeader().put(header.getName(), header.getValue());
+                if (header.getName().equals("Content-Type") && StringUtils.isNotBlank(header.getValue())) {
+                    ContentType contentType = ContentType.get(header.getValue());
+                    if(contentType!= null) {
+                       meta.setContentType(contentType);
                     }
-                    value = ImageContentType.get(value);
-                    suffix = value;
                 }
             }
-
-            File target = new File(this.basePath + this.fileName + suffix);
-            if (!target.getParentFile().exists()) {
-                target.getParentFile().mkdirs();
-            }
-
             byte[] data = EntityUtils.toByteArray(response.getEntity());
-            FileUtils.writeByteArrayToFile(target, data);
-            return target;
+            meta.setData(data);
+            return meta;
         }
     }
 
-    public enum ImageContentType {
-        gif("image/gif"),
-//        net("image/pnetvue"),
-//        tif("image/tiff"),
-//        fax("image/fax"),
-        ico("image/x-icon"),
-//        jfif("image/jpeg"),
-//        jpe("image/jpeg"),
-//        jpeg("image/jpeg"),
-        jpg("image/jpeg"),
-        png("image/png");
-        private String value;
+    public enum ContentType {
+        //        atom_xml("application/atom+xml"),
+//        post_form("application/x-www-form-urlencoded"),
+        json("application/json"),
+        //        octet_stream("application/octet-stream"),
+//        svg_xml("application/svg+xml"),
+//        xhtml_xml("application/xhtml+xml"),
+        xml("application/xml"),
+        pdf("application/pdf"),
+        zip("application/zip"),
+        rtf("application/rtf"),
+        gzip("application/gzip"),
 
-        ImageContentType(String value) {
-            this.value = value;
+        webp("image/webp"),
+        png("image/png"),
+        gif("image/gif"),
+        jpeg("image/jpeg"),
+        svg("image/svg+xml"),
+        tiff("image/tiff"),
+        ico("image/x-icon"),
+        fax("image/fax"),
+        bmp("image/bmp"),
+
+        wav("audio/x-wav", "audio/vnd.wave"),
+        wma("audio/x-ms-wax", "audio/x-ms-wma"),
+        mp4("audio/mp4"),
+        mp3("audio/mpeg"),
+        ogg("audio/ogg"),
+
+        avi("video/x-msvideo"),
+        quicktime("video/quicktime"),
+        webme("video/webme"),
+        wmv("video/x-ms-wmv"),
+
+        ;
+
+        // todo 增加视频、音频的类型、pdf、txt、zip等等常用的
+        private String[] values;
+
+        ContentType(String... values) {
+            this.values = values;
         }
 
-        public static String get(String type) {
+        public static ContentType get(String type) {
             if (StringUtils.isBlank(type)) {
-                return ImageContentType.jpg.name();
+                return null;
             }
-            for (ImageContentType contentType : ImageContentType.values()) {
-                if (type.toLowerCase().indexOf(contentType.value) != -1) {
-                    return contentType.name();
+            for (ContentType contentType : ContentType.values()) {
+
+                for (String v : contentType.values) {
+                    if (v.equalsIgnoreCase(type)) {
+                        return contentType;
+                    }
+                    if (type.toLowerCase().indexOf(v) != -1) {
+                        return contentType;
+                    }
                 }
             }
-            return ImageContentType.jpg.name();
+            return null;
         }
 
     }

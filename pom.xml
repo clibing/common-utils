@@ -6,7 +6,7 @@
 
     <groupId>cn.linuxcrypt</groupId>
     <artifactId>common-utils</artifactId>
-    <version>1.0.21</version>
+    <version>1.0.22</version>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -33,7 +33,7 @@
 
         <fst.version>2.57</fst.version>
         <reflections.version>0.9.12</reflections.version>
-        <bcprov-jdk15on.version>1.62</bcprov-jdk15on.version>
+        <bcprov-jdk15on.version>1.69</bcprov-jdk15on.version>
 
         <zxing.version>3.4.1</zxing.version>
 
@@ -273,6 +273,14 @@
             <artifactId>hibernate-validator</artifactId>
             <version>${hibernate-validator.version}</version>
         </dependency>
+
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-api</artifactId>
+            <version>5.7.2</version>
+            <scope>test</scope>
+        </dependency>
+
 
     </dependencies>
 
