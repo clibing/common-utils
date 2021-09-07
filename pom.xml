@@ -6,7 +6,7 @@
 
     <groupId>cn.linuxcrypt</groupId>
     <artifactId>common-utils</artifactId>
-    <version>1.0.24</version>
+    <version>1.0.25</version>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -34,7 +34,7 @@
         <poi-ooxml.version>4.1.2</poi-ooxml.version>
         <dom4j.version>2.1.3</dom4j.version>
 
-        <fst.version>3.0.3</fst.version>
+        <fst.version>2.57</fst.version>
         <reflections.version>0.9.12</reflections.version>
         <bcprov-jdk15on.version>1.69</bcprov-jdk15on.version>
 
