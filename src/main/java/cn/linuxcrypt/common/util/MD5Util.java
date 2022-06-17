@@ -84,7 +84,12 @@ public class MD5Util {
         return getMD5String(str.getBytes());
     }
 
-    private static String getMD5String(byte[] bytes) {
+    /**
+     * 开启 byte[] 数组模式
+     * @param bytes
+     * @return
+     */
+    public static String getMD5String(byte[] bytes) {
         messagedigest.update(bytes);
         return bufferToHex(messagedigest.digest());
     }
