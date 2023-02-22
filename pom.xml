@@ -19,7 +19,7 @@
         <pinyin4j.version>2.5.1</pinyin4j.version>
         <commons-dbcp.version>1.4</commons-dbcp.version>
         <commons-dbutils.version>1.7</commons-dbutils.version>
-        <commons-fileupload.version>1.4</commons-fileupload.version>
+        <commons-fileupload.version>1.5</commons-fileupload.version>
         <!-- no update -->
 
         <commons-compress.version>1.21</commons-compress.version>
